@@ -26,7 +26,7 @@ namespace BlazorAdSample.Client
 
             builder.Services.AddMsalAuthentication(options =>
             {
-                builder.Configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
+                builder.Configuration.Bind("AzureAdB2CClient", options.ProviderOptions.Authentication);
                 options.ProviderOptions.DefaultAccessTokenScopes.Add("https://georgiadb2c.onmicrosoft.com/94e54391-c708-4077-af9a-08acda464536/API.Access");
             });
 
