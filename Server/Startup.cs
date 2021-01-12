@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 
-namespace Blazor5Demo.Server
+namespace BlazorAdSample.Server
 {
     public class Startup
     {
@@ -22,6 +25,13 @@ namespace Blazor5Demo.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAdB2C"));
+            services.Configure<JwtBearerOptions>(
+                JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.TokenValidationParameters.NameClaimType = "name";
+                });
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -47,6 +57,9 @@ namespace Blazor5Demo.Server
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

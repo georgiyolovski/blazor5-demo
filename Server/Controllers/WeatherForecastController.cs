@@ -1,13 +1,16 @@
-﻿using Blazor5Demo.Shared;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Web.Resource;
+using BlazorAdSample.Shared;
 
-namespace Blazor5Demo.Server.Controllers
+namespace BlazorAdSample.Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
@@ -19,6 +22,9 @@ namespace Blazor5Demo.Server.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
+        // The Web API will only accept tokens 1) for users, and 2) having the "API.Access" scope for this API
+        static readonly string[] scopeRequiredByApi = new string[] { "API.Access" };
+
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
@@ -27,6 +33,8 @@ namespace Blazor5Demo.Server.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
